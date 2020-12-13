@@ -56,7 +56,7 @@ snake_drawing : process(pixel_row, pixel_col)
         end if;
     end loop draw_loop;
 end Process;
-snake_positioning : process
+snake_positioning : process --- TODO: add collision code some
     variable old_head : integer range 0 to max_length := 0;
 begin
     wait until rising_edge(v_sync);
