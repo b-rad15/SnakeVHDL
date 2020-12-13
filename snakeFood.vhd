@@ -44,7 +44,7 @@ BEGIN
 
 		END PROCESS;
 
-food_generation : PROCESS (food_x, food_y, pixel_row, pixel_col)
+food_generation : PROCESS
 
 BEGIN
 	IF (snake_x >= food_x - 15 AND snake_x <= food_x + 15) AND (snake_y >= food_y - 15 AND snake_y <= food_y + 15) THEN
