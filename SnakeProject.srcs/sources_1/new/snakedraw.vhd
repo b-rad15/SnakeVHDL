@@ -52,6 +52,7 @@ architecture Behavioral of snakedraw is
     SIGNAL S_red, S_green, S_blue : STD_LOGIC; --_VECTOR (3 DOWNTO 0);
     SIGNAL S_vsync : STD_LOGIC;
     SIGNAL S_pixel_row, S_pixel_col : STD_LOGIC_VECTOR (10 DOWNTO 0);
+    signal S_next_dir : std_logic_vector (3 downto 0) := "0100"; -- start our going right
 
     COMPONENT vga_sync IS
         PORT (
