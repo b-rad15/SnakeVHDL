@@ -53,6 +53,10 @@ architecture Behavioral of snakedraw is
     SIGNAL S_vsync : STD_LOGIC;
     SIGNAL S_pixel_row, S_pixel_col : STD_LOGIC_VECTOR (10 DOWNTO 0);
     signal S_next_dir : std_logic_vector (3 downto 0) := "0100"; -- start our going right
+    -- snake out signals
+    signal head_x, head_y : integer := 0;
+    -- control signal
+    signal S_rst : std_logic := '0';
 
     COMPONENT vga_sync IS
         PORT (
@@ -76,7 +80,20 @@ architecture Behavioral of snakedraw is
       clk_out1 : out std_logic
     );
     end component;
-
+    
+    component snakepos is
+        port (
+            reset : IN STD_LOGIC := '0';
+            length_in : in integer range 0 to 50 := 1;
+            next_dir : in std_logic_vector(3 downto 0) := "0100";
+            v_sync : IN STD_LOGIC := '0';
+            pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0) := (others => '0');
+            pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0) := (others => '0');
+            green : OUT STD_LOGIC;
+            head_x : out integer;
+            head_y : out integer
+        );
+    end component;
 begin
 
     vga_driver : vga_sync
@@ -94,5 +111,18 @@ begin
         vsync => S_vsync
     );
     VGA_vsync <= S_vsync; --connect output vsync
+    
+    snake_pos_and_draw : snakepos
+    port map(
+        reset => S_rst,
+        length_in => 1,
+        next_dir => "0100",
+        v_sync => S_vsync,
+        pixel_row => S_pixel_row,
+        pixel_col => S_pixel_col,
+        green => S_green,
+        head_x => head_x,
+        head_y => head_y
+    );
 
 end Behavioral;

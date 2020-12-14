@@ -14,13 +14,12 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity snakepos is
 	port (
-		clk : IN STD_LOGIC;
-		reset : IN STD_LOGIC;
+		reset : IN STD_LOGIC := '0';
 		length_in : in integer range 0 to 50 := 1;
 		next_dir : in std_logic_vector(3 downto 0) := "0100";
 	    v_sync : IN STD_LOGIC;
-		pixel_row : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-		pixel_col : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		green : OUT STD_LOGIC;
 		head_x : out integer;
 		head_y : out integer
