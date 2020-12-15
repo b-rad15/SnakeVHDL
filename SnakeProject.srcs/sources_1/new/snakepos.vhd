@@ -14,28 +14,34 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity snakepos is
 	port (
-		clk : IN STD_LOGIC;
-		reset : IN STD_LOGIC;
+		reset : IN STD_LOGIC := '0';
 		length_in : in integer range 0 to 50 := 1;
-		next_dir : in std_logic_vector(3 downto 0) := "0100";
 	    v_sync : IN STD_LOGIC;
-		pixel_row : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
-		pixel_col : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+		pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+		pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
 		green : OUT STD_LOGIC;
 		head_x : out integer;
-		head_y : out integer
+		head_y : out integer;
+		
+		btn_up : IN STD_LOGIC;  
+		btn_down : IN STD_LOGIC;
+		btn_left : IN STD_LOGIC;
+		btn_right : IN STD_LOGIC
+
 	);
 end snakepos;
 
 architecture Behavioral of snakepos is
     constant snake_size : integer := 30;
-    constant max_length : integer := 300;
+    constant max_length : integer := 30;
     constant grid_size : integer := 40;
     constant boundary : integer := (grid_size-snake_size)/2;
     signal snake_on : std_logic := '0';
     type snake_pieces_array_type is array (0 to max_length, 0 to 2) of integer range 0 to 20; --- array of pieces where each piece contains 1 number for on or off and then the x,y grid coordinate
     signal snake_pieces : snake_pieces_array_type := ((1, 0, 0), others => (0,20,20));
     shared variable head_pos : integer range 0 to max_length := 0;
+    shared variable next_dir : std_logic_vector(3 downto 0) := "0100";
+    
 begin
 green <= snake_on;
 snake_drawing : process(pixel_row, pixel_col)
@@ -46,12 +52,13 @@ snake_drawing : process(pixel_row, pixel_col)
             return pixel_coord;
         end function grid_to_pixel;
     begin
-    draw_loop : for i in 0 to length_in loop
-        if (snake_pieces(i, 0) = 0)
-            and (CONV_INTEGER(pixel_row) > grid_to_pixel(snake_pieces(i, 1)))
-            and (CONV_INTEGER(pixel_row) < grid_to_pixel(snake_pieces(i, 1)) + grid_size)
-            and (CONV_INTEGER(pixel_col) > grid_to_pixel(snake_pieces(i, 2)))
-            and (CONV_INTEGER(pixel_col) < grid_to_pixel(snake_pieces(i, 2)) + grid_size) then
+    snake_on <= '0';
+    draw_loop : for i in 0 to max_length loop
+        if (snake_pieces(i, 0) = 1)
+            and (CONV_INTEGER(pixel_col) > grid_to_pixel(snake_pieces(i, 1)))
+            and (CONV_INTEGER(pixel_col) < grid_to_pixel(snake_pieces(i, 1)) + grid_size)
+            and (CONV_INTEGER(pixel_row) > grid_to_pixel(snake_pieces(i, 2)))
+            and (CONV_INTEGER(pixel_row) < grid_to_pixel(snake_pieces(i, 2)) + grid_size) then
                 snake_on <= '1';
         end if;
     end loop draw_loop;
@@ -62,6 +69,17 @@ begin
     wait until rising_edge(v_sync);
     old_head := head_pos;
     head_pos := (head_pos - 1) mod length_in;
+    
+    if btn_left = '1' then         
+         next_dir := "1000";        
+    elsif btn_right = '1' then     
+         next_dir := "0100";        
+    elsif btn_up = '1' then        
+         next_dir := "0010";        
+    elsif btn_down = '1' then      
+        next_dir := "0001";        
+    end if;                        
+    
     case next_dir is
         when "1000" => --- left
             snake_pieces(head_pos, 0) <= 1;
@@ -74,22 +92,28 @@ begin
         when "0010" => --- up
             snake_pieces(head_pos, 0) <= 1;
             snake_pieces(head_pos, 1) <= snake_pieces(old_head, 1);
-            snake_pieces(head_pos, 2) <= snake_pieces(old_head, 2) + 1;
+            snake_pieces(head_pos, 2) <= snake_pieces(old_head, 2) - 1;
         when "0001" => --- down
             snake_pieces(head_pos, 0) <= 1;
             snake_pieces(head_pos, 1) <= snake_pieces(old_head, 1);
-            snake_pieces(head_pos, 2) <= snake_pieces(old_head, 2) - 1;
+            snake_pieces(head_pos, 2) <= snake_pieces(old_head, 2) + 1;
+        when others => --- right
+            snake_pieces(head_pos, 0) <= 1;
+            snake_pieces(head_pos, 1) <= snake_pieces(old_head, 1) + 1;
+            snake_pieces(head_pos, 2) <= snake_pieces(old_head, 2);
+    
     end case;
+    
     head_x <= snake_pieces(head_pos, 1);
     head_y <= snake_pieces(head_pos, 2);
 end process;
-length_change : process(length_in)
-    variable snake_pieces_copy : snake_pieces_array_type := snake_pieces;
-begin
-    copy_loop : for i in 0 to length_in loop
-        snake_pieces(i, 0) <= 1;
-        snake_pieces(i, 1) <= snake_pieces_copy((i+head_pos) mod length_in-1, 1);
-        snake_pieces(i, 2) <= snake_pieces_copy((i+head_pos) mod length_in-1, 2);
-    end loop;
-end process;
+--length_change : process(length_in)
+--    variable snake_pieces_copy : snake_pieces_array_type := snake_pieces;
+--begin
+--    copy_loop : for i in 0 to max_length loop
+--        snake_pieces(i, 0) <= 1;
+--        snake_pieces(i, 1) <= snake_pieces_copy((i+head_pos) mod length_in-1, 1);
+--        snake_pieces(i, 2) <= snake_pieces_copy((i+head_pos) mod length_in-1, 2);
+--    end loop;
+--end process;
 end Behavioral;
