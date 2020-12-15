@@ -39,10 +39,12 @@ entity snakedraw is
         VGA_blue : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         VGA_hsync : OUT STD_LOGIC;
         VGA_vsync : OUT STD_LOGIC;
-        btn_up : IN STD_LOGIC;
-        btn_down : IN STD_LOGIC;
-        btn_left : IN STD_LOGIC;
-        btn_right : IN STD_LOGIC
+        
+        btn_up : IN STD_LOGIC;  
+		btn_down : IN STD_LOGIC;
+		btn_left : IN STD_LOGIC;
+		btn_right : IN STD_LOGIC
+
    );
 end snakedraw;
 
@@ -52,11 +54,12 @@ architecture Behavioral of snakedraw is
     SIGNAL S_red, S_green, S_blue : STD_LOGIC; --_VECTOR (3 DOWNTO 0);
     SIGNAL S_vsync : STD_LOGIC;
     SIGNAL S_pixel_row, S_pixel_col : STD_LOGIC_VECTOR (10 DOWNTO 0);
-    signal S_next_dir : std_logic_vector (3 downto 0) := "0100"; -- start our going right
+    --signal S_next_dir : std_logic_vector (3 downto 0) := "0100"; -- start our going right
     -- snake out signals
     signal head_x, head_y : integer := 0;
     -- control signal
     signal S_rst : std_logic := '0';
+    
 
     COMPONENT vga_sync IS
         PORT (
@@ -85,50 +88,58 @@ architecture Behavioral of snakedraw is
         port (
             reset : IN STD_LOGIC := '0';
             length_in : in integer range 0 to 50 := 1;
-            next_dir : in std_logic_vector(3 downto 0) := "0100";
             v_sync : IN STD_LOGIC := '0';
             pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0) := (others => '0');
             pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0) := (others => '0');
             green : OUT STD_LOGIC;
             head_x : out integer;
-            head_y : out integer
+            head_y : out integer;
+            
+            btn_up : IN STD_LOGIC;  
+		    btn_down : IN STD_LOGIC;
+		    btn_left : IN STD_LOGIC;
+		    btn_right : IN STD_LOGIC
         );
     end component;
 begin
 
     vga_driver : vga_sync
     PORT MAP(--instantiate vga_sync component
-        pixel_clk => pxl_clk,
-        red_in => S_red & "000",
-        green_in => S_green & "000",
-        blue_in => S_blue & "000",
-        red_out => VGA_red,
-        green_out => VGA_green,
-        blue_out => VGA_blue,
-        pixel_row => S_pixel_row,
-        pixel_col => S_pixel_col,
-        hsync => VGA_hsync,
+        pixel_clk => pxl_clk, 
+        red_in => S_red & "000", 
+        green_in => S_green & "000", 
+        blue_in => S_blue & "000", 
+        red_out => VGA_red, 
+        green_out => VGA_green, 
+        blue_out => VGA_blue, 
+        pixel_row => S_pixel_row, 
+        pixel_col => S_pixel_col, 
+        hsync => VGA_hsync, 
         vsync => S_vsync
     );
     VGA_vsync <= S_vsync; --connect output vsync
-    
-    clk_wiz_0_inst : clk_wiz_0
-    port map (
-      clk_in1 => clk_in,
-      clk_out1 => pxl_clk
-    );
     
     snake_pos_and_draw : snakepos
     port map(
         reset => S_rst,
         length_in => 1,
-        next_dir => "0100",
         v_sync => S_vsync,
         pixel_row => S_pixel_row,
         pixel_col => S_pixel_col,
         green => S_green,
         head_x => head_x,
-        head_y => head_y
+        head_y => head_y,
+        
+        btn_up => btn_up,
+        btn_down => btn_down,
+        btn_left => btn_left,
+        btn_right => btn_right
+    );
+    
+     clk_wiz_0_inst : clk_wiz_0
+    port map (
+      clk_in1 => clk_in,
+      clk_out1 => pxl_clk
     );
 
 end Behavioral;
