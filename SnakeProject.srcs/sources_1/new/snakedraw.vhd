@@ -98,19 +98,25 @@ begin
 
     vga_driver : vga_sync
     PORT MAP(--instantiate vga_sync component
-        pixel_clk => pxl_clk, 
-        red_in => S_red & "000", 
-        green_in => S_green & "000", 
-        blue_in => S_blue & "000", 
-        red_out => VGA_red, 
-        green_out => VGA_green, 
-        blue_out => VGA_blue, 
-        pixel_row => S_pixel_row, 
-        pixel_col => S_pixel_col, 
-        hsync => VGA_hsync, 
+        pixel_clk => pxl_clk,
+        red_in => S_red & "000",
+        green_in => S_green & "000",
+        blue_in => S_blue & "000",
+        red_out => VGA_red,
+        green_out => VGA_green,
+        blue_out => VGA_blue,
+        pixel_row => S_pixel_row,
+        pixel_col => S_pixel_col,
+        hsync => VGA_hsync,
         vsync => S_vsync
     );
     VGA_vsync <= S_vsync; --connect output vsync
+    
+    clk_wiz_0_inst : clk_wiz_0
+    port map (
+      clk_in1 => clk_in,
+      clk_out1 => pxl_clk
+    );
     
     snake_pos_and_draw : snakepos
     port map(

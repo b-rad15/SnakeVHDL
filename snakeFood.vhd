@@ -78,5 +78,6 @@ BEGIN
 		          food_y <= CONV_STD_LOGIC_VECTOR(50,10);
 
 		END IF;
+    end if;
 END process;
 END architecture;
