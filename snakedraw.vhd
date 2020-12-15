@@ -60,9 +60,7 @@ architecture Behavioral of snakedraw is
     signal head_x, head_y : integer := 0;
     -- control signal
     signal S_rst : std_logic := '0';
-    -----------------------------------------------
-    signal S_length : integer := 1;
-    -----------------------------------------------
+
 
     COMPONENT vga_sync IS
         PORT (
@@ -139,7 +137,6 @@ begin
         btn_left => btn_left,
         btn_right => btn_right,
         btn_len => btn_len
-        
     );
     
      clk_wiz_0_inst : clk_wiz_0
