@@ -1,1 +1,1 @@
-# CPE 467 Final Project - Snake on an FPGA
+# CPE 467 Final Project - Snake Game on an FPGA
